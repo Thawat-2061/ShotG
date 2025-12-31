@@ -1,6 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
-import ENDPOINTS from "../config";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -8,9 +6,13 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    // สำหรับใช้วิดีโอหรือภาพจาก URL สาธารณะ (ไม่ใช่ Google Drive)
+    const BACKGROUND_MEDIA_URL = ""; // ใส่ URL ของวิดีโอหรือภาพที่นี่
+    const USE_VIDEO = false; // เปลี่ยนเป็น true ถ้าใช้วิดีโอ
+
     const handleLogin = async () => {
         if (!email || !password) {
-            setError("Please enter email and password");
+            setError("กรุณากรอกชื่อและรหัสผ่านค่ะ 💕");
             return;
         }
 
@@ -18,177 +20,323 @@ export default function Login() {
             setLoading(true);
             setError("");
 
-            const res = await axios.post(ENDPOINTS.LOGIN, {
-                identifier: email,
-                password,
-            });
-
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("authUser", JSON.stringify(res.data.user));
-
-            window.location.href = "/";
+            // ตรวจสอบ login (email ได้ 2 แบบ: "Sai" หรือ "ทราย", รหัสเดียว: "26062568")
+            if ((email === "sai" || email === "ทราย") && password === "26062568") {
+                alert("เข้าไปในใจแม็คสำเร็จ ❤️");
+                // Navigate ไปหน้าแรก
+                window.location.href = "/";
+            } else {
+                alert("จำไม่ได้หรอ ใจร้ายจัง TvT");
+                setError("ชื่อหรือรหัสผ่านไม่ถูกต้องค่ะ 💔");
+            }
+            
         } catch {
-            setError("Invalid email or password");
+            setError("เกิดข้อผิดพลาดค่ะ");
         } finally {
             setLoading(false);
         }
     };
 
-    /* ---------- styles ---------- */
-
-    const contentStyle: React.CSSProperties = {
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Arial, sans-serif",
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleLogin();
+        }
     };
 
-
-
-
-    const cardStyle: React.CSSProperties = {
-        background: "rgba(10, 10, 30, 0.30)",
-        backdropFilter: "blur(14px)",
-
-        WebkitBackdropFilter: "blur(18px) saturate(140%)", // Safari
-        padding: "26px",
-        borderRadius: "18px",
-        width: "320px",
-        textAlign: "center",
-
-        border: "1px solid rgba(255,255,255,0.15)", // ขอบกระจก
-        boxShadow: `
-    0 0 60px rgba(120, 100, 255, 0.35),
-    0 25px 70px rgba(0,0,0,0.8)
-  `,
+    const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        e.currentTarget.style.borderColor = '#ff69b4';
+        e.currentTarget.style.boxShadow = '0 0 0 3px rgba(255, 105, 180, 0.1)';
     };
 
-
-
-
-    const titleStyle: React.CSSProperties = {
-        color: "#4f6bff",
-        fontSize: "2rem",
-        fontWeight: 800,
-        marginBottom: "20px",
+    const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        e.currentTarget.style.borderColor = 'rgba(255, 105, 180, 0.3)';
+        e.currentTarget.style.boxShadow = 'none';
     };
 
-    const inputStyle: React.CSSProperties = {
-        padding: "10px",
-        marginBottom: "12px",
-        borderRadius: "6px",
-        border: "none",
-        backgroundColor: "rgba(0,0,0,0.65)",
-        color: "white",
-        fontSize: "16px",
-        outline: "none",
+    const handleButtonMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!loading) {
+            e.currentTarget.style.transform = 'translateY(-2px)';
+            e.currentTarget.style.boxShadow = '0 8px 20px rgba(255, 105, 180, 0.4)';
+        }
     };
 
-    const buttonStyle: React.CSSProperties = {
-        padding: "10px",
-        borderRadius: "6px",
-        border: "none",
-        backgroundColor: "#0278f7",
-        fontWeight: 700,
-        cursor: "pointer",
+    const handleButtonMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 5px 15px rgba(255, 105, 180, 0.3)';
     };
-
-    const errorStyle: React.CSSProperties = {
-        color: "#ff4d4f",
-        marginBottom: "10px",
-        fontSize: "0.9rem",
-    };
-
-    const logoStyle: React.CSSProperties = {
-        width: "90px",
-        height: "90px",
-        borderRadius: "50%",
-        margin: "0 auto 20px",
-        boxShadow: "0 10px 20px rgba(0,0,0,0.4)",
-    };
-
-    /* ---------- render ---------- */
 
     return (
-        <>
-            {/* ===== Space BG ===== */}
-            <div
-                style={{
-                    position: "fixed",
+        <div style={{
+            position: 'fixed',
+            inset: 0,
+            overflow: 'hidden',
+            fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+        }}>
+            {/* Animated Gradient Background */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffecd2, #fcb69f, #ff9a9e)',
+                backgroundSize: '400% 400%',
+                animation: 'gradientShift 15s ease infinite'
+            }} />
+
+            {/* Optional: Background Media (ถ้ามี URL) */}
+            {BACKGROUND_MEDIA_URL && (
+                <div style={{
+                    position: 'absolute',
                     inset: 0,
-                    zIndex: -2,
-                    overflow: "hidden",
-                }}
-            >
-                <iframe
-                    src="/bg.html"
-                    title="space-bg"
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        border: "none",
-                        pointerEvents: "none",
-                    }}
-                />
+                    zIndex: 1
+                }}>
+                    {USE_VIDEO ? (
+                        <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                opacity: 0.4
+                            }}
+                        >
+                            <source src={BACKGROUND_MEDIA_URL} type="video/mp4" />
+                        </video>
+                    ) : (
+                        <img
+                            src={BACKGROUND_MEDIA_URL}
+                            alt="background"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                opacity: 0.4
+                            }}
+                        />
+                    )}
+                </div>
+            )}
+
+            {/* Floating Hearts */}
+            <div style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 2,
+                pointerEvents: 'none',
+                overflow: 'hidden'
+            }}>
+                {[...Array(20)].map((_, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            position: 'absolute',
+                            left: `${Math.random() * 100}%`,
+                            fontSize: `${Math.random() * 20 + 10}px`,
+                            opacity: 0.2 + Math.random() * 0.3,
+                            animation: `floatUp ${10 + Math.random() * 10}s linear infinite`,
+                            animationDelay: `${Math.random() * 10}s`,
+                            color: '#ff69b4'
+                        }}
+                    >
+                        ❤
+                    </div>
+                ))}
             </div>
 
-            {/* ===== Dark Overlay ===== */}
-            <div
-                style={{
-                    position: "fixed",
-                    inset: 0,
-                    zIndex: -1,
-                    background:
-                        "radial-gradient(circle at center, rgba(0,0,0,0.35), rgba(0,0,0,0.85))",
-                }}
-            />
+            {/* Main Content */}
+            <div style={{
+                position: 'relative',
+                zIndex: 3,
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '20px'
+            }}>
+                <div style={{
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    padding: '40px',
+                    borderRadius: '30px',
+                    width: '100%',
+                    maxWidth: '400px',
+                    textAlign: 'center',
+                    boxShadow: '0 20px 60px rgba(255, 105, 180, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5)',
+                    border: '3px solid rgba(255, 192, 203, 0.5)'
+                }}>
+                    {/* Heart Logo */}
+                    <div style={{
+                        width: '100px',
+                        height: '100px',
+                        margin: '0 auto 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, #ff9a9e, #ff6b9d)',
+                        borderRadius: '50%',
+                        boxShadow: '0 10px 30px rgba(255, 105, 180, 0.4)',
+                        fontSize: '50px',
+                        animation: 'heartbeat 1.5s ease-in-out infinite'
+                    }}>
+                        💕
+                    </div>
 
-            {/* ===== Login Content ===== */}
-            <div style={contentStyle}>
-                <div style={cardStyle}>
-                    <img
-                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSX7twFVDnuQJdGFWns0m7bKsKNK5tldjNBbA&s"
-                        alt="logo"
-                        style={logoStyle}
-                    />
+                    {/* Title */}
+                    <h1 style={{
+                        background: 'linear-gradient(135deg, #ff6b9d, #c94b4b)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        fontSize: '2.2rem',
+                        fontWeight: '800',
+                        marginBottom: '10px',
+                        letterSpacing: '1px'
+                    }}>
+                        Welcome Back
+                    </h1>
 
-                    <h2 style={titleStyle}>SIGN IN</h2>
+                    <p style={{
+                        color: '#ff69b4',
+                        fontSize: '0.95rem',
+                        marginBottom: '30px',
+                        fontWeight: '500'
+                    }}>
+                        Login to your couple account ❤️
+                    </p>
 
-                    {error && <div style={errorStyle}>{error}</div>}
+                    {/* Error Message */}
+                    {error && (
+                        <div style={{
+                            background: 'rgba(255, 77, 79, 0.1)',
+                            border: '1px solid #ff4d4f',
+                            borderRadius: '12px',
+                            padding: '10px',
+                            marginBottom: '20px',
+                            color: '#ff4d4f',
+                            fontSize: '0.9rem'
+                        }}>
+                            {error}
+                        </div>
+                    )}
 
-                    <input
-                        type="email"
-                        placeholder="Username or Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        style={inputStyle}
-                    />
+                    {/* Email Input */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <input
+                            type="text"
+                            placeholder="💌 คนที่น่ารักที่สุด (ชื่อเล่น)"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            onFocus={handleInputFocus}
+                            onBlur={handleInputBlur}
+                            style={{
+                                width: '100%',
+                                padding: '15px 20px',
+                                borderRadius: '15px',
+                                border: '2px solid rgba(255, 105, 180, 0.3)',
+                                backgroundColor: 'rgba(255, 240, 245, 0.8)',
+                                color: '#333',
+                                fontSize: '16px',
+                                outline: 'none',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                        />
+                    </div>
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={inputStyle}
-                    />
+                    {/* Password Input */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <input
+                            type="password"
+                            placeholder="🔒 วัน/เดือน/ปี ครบรอบ"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            onFocus={handleInputFocus}
+                            onBlur={handleInputBlur}
+                            style={{
+                                width: '100%',
+                                padding: '15px 20px',
+                                borderRadius: '15px',
+                                border: '2px solid rgba(255, 105, 180, 0.3)',
+                                backgroundColor: 'rgba(255, 240, 245, 0.8)',
+                                color: '#333',
+                                fontSize: '16px',
+                                outline: 'none',
+                                transition: 'all 0.3s ease',
+                                boxSizing: 'border-box'
+                            }}
+                        />
+                    </div>
 
-                    <button onClick={handleLogin} disabled={loading} style={buttonStyle}>
-                        {loading ? "Logging in..." : "Login"}
+                    {/* Login Button */}
+                    <button
+                        onClick={handleLogin}
+                        disabled={loading}
+                        onMouseEnter={handleButtonMouseEnter}
+                        onMouseLeave={handleButtonMouseLeave}
+                        style={{
+                            width: '100%',
+                            padding: '15px',
+                            borderRadius: '15px',
+                            border: 'none',
+                            background: 'linear-gradient(135deg, #ff6b9d, #c94b4b)',
+                            color: 'white',
+                            fontSize: '18px',
+                            fontWeight: '700',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            transition: 'all 0.3s ease',
+                            boxShadow: '0 5px 15px rgba(255, 105, 180, 0.3)',
+                            opacity: loading ? 0.7 : 1
+                        }}
+                    >
+                        {loading ? '💖 กำลังเข้าสู่ระบบ...' : '💗 Login'}
                     </button>
 
-                    <p style={{ marginTop: 20, fontSize: "0.9rem", color: "white" }}>
-                        Don't have an account?{" "}
-                        <span
-                            style={{ color: "#667eea", cursor: "pointer" }}
-                            onClick={() => (window.location.href = "/register")}
-                        >
-                            sign up
-                        </span>
+                    {/* Footer Text */}
+                    <p style={{
+                        marginTop: '25px',
+                        fontSize: '0.85rem',
+                        color: '#999',
+                        fontStyle: 'italic'
+                    }}>
+                        Made with love 💕
                     </p>
                 </div>
             </div>
-        </>
-    );
 
+            {/* CSS Animations */}
+            <style>{`
+                @keyframes gradientShift {
+                    0% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                    100% { background-position: 0% 50%; }
+                }
+
+                @keyframes heartbeat {
+                    0%, 100% { transform: scale(1); }
+                    10%, 30% { transform: scale(1.1); }
+                    20%, 40% { transform: scale(1); }
+                }
+
+                @keyframes floatUp {
+                    0% {
+                        transform: translateY(100vh) rotate(0deg);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 0.5;
+                    }
+                    90% {
+                        opacity: 0.5;
+                    }
+                    100% {
+                        transform: translateY(-100px) rotate(360deg);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
+        </div>
+    );
 }

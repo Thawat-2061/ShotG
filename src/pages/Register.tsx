@@ -39,7 +39,7 @@ export default function Register() {
             });
 
             alert("Register success! Please login.");
-            window.location.href = "/login";
+            window.location.href = "/";
         } catch {
             setError("Registration failed");
         } finally {
