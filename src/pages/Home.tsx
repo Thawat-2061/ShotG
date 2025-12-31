@@ -113,14 +113,13 @@ export default function Home() {
     setIndex(prev => (prev + 1) % slides.length);
   };
 
-  /* ▶️ คุมเล่น/หยุด (แก้ ESLint แล้ว) */
   const togglePlay = () => {
     setPlaying(prev => {
       const next = !prev;
 
       if (audioRef.current) {
         if (next) {
-          audioRef.current.play();
+          audioRef.current.play().catch(() => {});
         } else {
           audioRef.current.pause();
         }
@@ -130,7 +129,6 @@ export default function Home() {
     });
   };
 
-  /* ⏱ auto slide สำหรับรูป */
   useEffect(() => {
     if (!playing) return;
 
@@ -149,7 +147,6 @@ export default function Home() {
     };
   }, [index, playing, current]);
 
-  /* 🔊 ตั้งระดับเสียง */
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = 0.3;
@@ -164,6 +161,7 @@ export default function Home() {
             key={current.id}
             src={current.src}
             style={{ ...media, objectFit: "contain" }}
+            alt={`Slide ${current.id}`}
           />
         ) : (
           <video
@@ -182,7 +180,6 @@ export default function Home() {
         {playing ? "⏸ หยุด" : "▶ เล่น"}
       </button>
 
-      {/* 🎵 Background Music */}
       <audio ref={audioRef} src={bgMusic} loop preload="auto" />
     </div>
   );
@@ -221,4 +218,5 @@ const button: React.CSSProperties = {
   color: "#d63384",
   fontWeight: 600,
   cursor: "pointer",
+  zIndex: 10,
 };
