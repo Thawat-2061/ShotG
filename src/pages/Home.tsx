@@ -48,6 +48,9 @@ import vid34 from "../assets/videos/34.mp4";
 import vid35 from "../assets/videos/35.mp4";
 import vid36 from "../assets/videos/36.mp4";
 
+/* ================= Music ================= */
+import bgMusic from "../assets/music/wake.mp3";
+
 /* ================= Media Map ================= */
 const mediaMap: Record<string, { type: SlideType; src: string }> = {
   "01": { type: "image", src: img01 },
@@ -100,7 +103,9 @@ const slides: SlideItem[] = Object.keys(mediaMap)
 export default function Home() {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+
   const timerRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const current = slides[index];
 
@@ -108,6 +113,24 @@ export default function Home() {
     setIndex(prev => (prev + 1) % slides.length);
   };
 
+  /* ▶️ คุมเล่น/หยุด (แก้ ESLint แล้ว) */
+  const togglePlay = () => {
+    setPlaying(prev => {
+      const next = !prev;
+
+      if (audioRef.current) {
+        if (next) {
+          audioRef.current.play();
+        } else {
+          audioRef.current.pause();
+        }
+      }
+
+      return next;
+    });
+  };
+
+  /* ⏱ auto slide สำหรับรูป */
   useEffect(() => {
     if (!playing) return;
 
@@ -119,9 +142,19 @@ export default function Home() {
     }
 
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     };
   }, [index, playing, current]);
+
+  /* 🔊 ตั้งระดับเสียง */
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.3;
+    }
+  }, []);
 
   return (
     <div style={container}>
@@ -130,19 +163,13 @@ export default function Home() {
           <img
             key={current.id}
             src={current.src}
-            style={{
-              ...media,
-              objectFit: "contain",
-            }}
+            style={{ ...media, objectFit: "contain" }}
           />
         ) : (
           <video
             key={current.id}
             src={current.src}
-            style={{
-              ...media,
-              objectFit: "cover",
-            }}
+            style={{ ...media, objectFit: "cover" }}
             autoPlay={playing}
             muted
             playsInline
@@ -151,9 +178,12 @@ export default function Home() {
         )}
       </div>
 
-      <button onClick={() => setPlaying(p => !p)} style={button}>
+      <button onClick={togglePlay} style={button}>
         {playing ? "⏸ หยุด" : "▶ เล่น"}
       </button>
+
+      {/* 🎵 Background Music */}
+      <audio ref={audioRef} src={bgMusic} loop preload="auto" />
     </div>
   );
 }
@@ -192,12 +222,3 @@ const button: React.CSSProperties = {
   fontWeight: 600,
   cursor: "pointer",
 };
-
-/* ================= Animation ================= */
-// ใส่ใน global css หรือ index.css
-/*
-@keyframes fade {
-  from { opacity: 0 }
-  to { opacity: 1 }
-}
-*/

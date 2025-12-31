@@ -71,6 +71,10 @@ button:hover {
     background: radial-gradient(ellipse at bottom, #0b0d2a 0%, #000 100%);
 }
 
+@keyframes fade {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
 
 
 
